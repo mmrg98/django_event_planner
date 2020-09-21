@@ -2,6 +2,24 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.views import View
 from .forms import UserSignup, UserLogin
+from django.contrib.auth.models import User
+from .models import Events
+
+from rest_framework.views import APIView
+from rest_framework.generics import (
+	ListAPIView, RetrieveAPIView, RetrieveUpdateAPIView, DestroyAPIView, CreateAPIView
+	)
+from .serializers import (CreatEventSerializer, EventsSerializer,
+	EventDetailSerializer
+	)
+
+
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+#from .permissions import IsOwner, EditTask, EditBoard
+
 
 def home(request):
     return render(request, 'home.html')
@@ -59,3 +77,69 @@ class Logout(View):
         messages.success(request, "You have successfully logged out.")
         return redirect("login")
 
+
+############################################################################
+#class Register(CreateAPIView):
+#    serializer_class = RegisterSerializer
+
+class EventCreate(CreateAPIView):
+    serializer_class = CreatEventSerializer
+    permission_classes = [IsAuthenticated]
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class EventsList(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'event_list.html'
+
+    def get(self, request):
+        queryset = Events.objects.all()
+        return Response({'events': queryset})
+
+
+class EventDetail(APIView):
+	renderer_classes = [TemplateHTMLRenderer]
+	template_name = 'event_detail.html'
+
+	def get(self, request,event_id):
+		queryset = Events.objects.get(id=event_id)
+		return Response({'event': queryset})
+
+
+class CreateEvent(APIView):
+	renderer_classes = [TemplateHTMLRenderer]
+	template_name = 'event_create.html'
+
+	def get(self, request):
+		serializer = CreatEventSerializer()
+		return Response({'serializer': serializer})
+
+	def post(self, request):
+		serializer = CreatEventSerializer(data=request.data)
+		return Response({'serializer': serializer})
+
+
+class UpdateEvent(APIView):
+	renderer_classes = [TemplateHTMLRenderer]
+	template_name = 'event_update.html'
+
+	def get(self, request, event_id):
+		event = get_object_or_404(Events, id=event_id)
+		serializer = CreatEventSerializer(event)
+		return Response({'serializer': serializer, 'event': event})
+
+	def post(self, request, event_id):
+		event = get_object_or_404(Events, id=event_id)
+		serializer = CreatEventSerializer(event, data=request.data)
+		if not serializer.is_valid():
+			return Response({'serializer': serializer, 'event': event})
+
+		serializer.save()
+		return redirect('list')
+
+
+class EventDelete(DestroyAPIView):
+	queryset = Events.objects.all()
+	lookup_field = 'id'
+	lookup_url_kwarg = 'board_id'
