@@ -15,6 +15,7 @@
           <a href="{% url 'detail' event_id=event.id %}" class="btn btn-primary">Datails</a>
           <a href="{% url 'update' event_id=event.id %}" class="btn btn-primary">Update</a>
           <p class="card-text">{{ event.seats }} seats</p>
+          <p class="card-text">{{ event.user.username }} owner</p>
         </div>
         <div class="card-footer text-muted">
           {{ event.datetime }}

@@ -1,16 +1,15 @@
 {% extends "base.html" %}
-{% load rest_framework %}
-
+{% load crispy_forms_tags %}
 {% block content %}
 
 <header class="masthead text-center text-white">
   <div class="masthead-content">
     <div class="container">
-        <div class="jumbotron">
+        <div class="jumbotron bg-success">
           <h2 class="masthead-subheading mb-0">Update Event</h2>
           <form action="{% url 'update' event_id=event.id %}" method="post">
             {% csrf_token %}
-            {% render_form serializer %}
+            {{form|crispy}}
             <input class = "btn btn-primary btn-xl rounded-pill mt-5" type="submit" value="Save">
           </form>
       </div>

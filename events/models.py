@@ -6,10 +6,16 @@ class Events(models.Model):
     title = models.CharField(max_length=150)
     description = description = models.TextField()
     location = models.CharField(max_length=150)
-    datetime = models.DateField(auto_now_add=True)
+    datetime = models.DateField()
     seats = models.PositiveIntegerField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-
     def __str__(self):
         return self.title
+
+class Book(models.Model):
+    guest = models.ForeignKey(User, on_delete=models.CASCADE)
+    event = models.ForeignKey(Events, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.event.title

@@ -4,15 +4,35 @@
 <header class="masthead text-center text-white">
   <div class="masthead-content">
     <div class="container">
+    {% for event in events %}
+      {% if request.user == event.user %}
+      <div class="card text-center m-2 bg-warning">
+        <div class="card-header bg-danger">
+          {{ event.location }}
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">{{ event.title }}</h5>
+          <p class="card-text">{{ event.description }}</p>
+          <a href="{% url 'detail' event_id=event.id %}" class="btn btn-primary">Datails</a>
+          <a href="{% url 'update' event_id=event.id %}" class="btn btn-primary">Update</a>
+          <p class="card-text">{{ event.seats }} seats</p>
+          <p class="card-text">{{ event.user.username }} owner</p>
+        </div>
+        <div class="card-footer text-muted">
+          {{ event.datetime }}
+        </div>
+      </div>
+      {% endif %}
+      {% endfor %}
+
       <h1 class="masthead-heading mb-0">All the events,</h1>
       <h2 class="masthead-subheading mb-0">You could ever want...</h2>
+
       {% if request.user.is_anonymous %}
         <a href="{% url 'signup' %}" class="btn btn-primary btn-xl rounded-pill mt-5">Sign up to find events!</a>
       {% else %}
         <a href="{% url 'list' %}" class="btn btn-primary btn-xl rounded-pill mt-5">Find events!</a>
       {% endif %}
-
-
 
     </div>
   </div>
