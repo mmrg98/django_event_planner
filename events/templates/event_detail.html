@@ -14,13 +14,27 @@
           <p class="card-text">{{ event.description }}</p>
 
           <a href="{% url 'book' event_id=event.id %}" class="btn btn-primary">Book</a>
-      
+
           <a href="{% url 'update' event_id=event.id %}" class="btn btn-primary">Update</a>
           <a href="{% url 'delete' event_id=event.id %}" class="btn btn-primary">Delete</a>
           <p class="card-text">{{ event.seats }} seats</p>
         </div>
         <div class="card-footer text-muted">
           {{ event.datetime }}
+          {%  if request.user.is_staff %}
+          <table style="width:100%">
+    <tr>
+      <th>Guests</th>
+    </tr>
+  {% for book in bookings %}
+  <tr>
+  <td>{{book.guest.username}}</td>
+  </tr>
+
+  {% endfor %}
+
+  </table>
+  {% endif %}
         </div>
       </div>
 

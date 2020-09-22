@@ -90,8 +90,10 @@ def event_list(request):
 
 def event_detail(request, event_id):
     event=Events.objects.get(id=event_id)
+    bookings = Book.objects.filter(event=event)
     context = {
         "event": event,
+        "bookings": bookings,
     }
     return render(request, 'event_detail.html', context)
 
@@ -156,9 +158,9 @@ def book_event(request, event_id):
         messages.success(request, "Sorry, you can't book this event")
         return redirect('detail', event_id)
 
-
     if request.user.is_anonymous:
         return redirect('signin')
+
     if request.method == "POST":
         form = BookForm(request.POST)
         if form.is_valid():
@@ -176,6 +178,14 @@ def book_event(request, event_id):
     }
     return render(request, 'book.html', context)
 
+def user_profile(request, user_id):
+    user= User.objects.get(id=user_id)
+    bookings = Book.objects.filter(guest=request.user.id)
+    context = {
+        "user": user,
+        "bookings": bookings,
+}
+    return render(request, 'profile.html',context)
 
 '''
     event = Events.objects.get(id=event_id)
