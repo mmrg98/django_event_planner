@@ -13,9 +13,11 @@ class Events(models.Model):
     def __str__(self):
         return self.title
 
+
 class Book(models.Model):
     guest = models.ForeignKey(User, on_delete=models.CASCADE)
     event = models.ForeignKey(Events, on_delete=models.CASCADE)
 
     def __str__(self):
+        self.event.seats-=1
         return self.event.title

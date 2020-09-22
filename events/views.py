@@ -5,7 +5,7 @@ from .forms import UserSignup, UserLogin, EventForm, BookForm
 from django.contrib.auth.models import User
 from .models import Events, Book
 from django.contrib import messages
-
+from datetime import date
 from datetime import datetime
 from django.db.models import Q
 #from .permissions import IsOwner, EditTask, EditBoard
@@ -131,7 +131,6 @@ def event_update(request, event_id):
     if request.method == "POST":
         form = EventForm(request.POST, instance=event)
         if form.is_valid():
-
             form.save()
             return redirect('list')
     context = {
@@ -152,12 +151,20 @@ def event_delete(request, event_id):
 def book_event(request, event_id):
     form = BookForm()
     event = Events.objects.get(id=event_id)
+    today = date.today()
+    if event.seats==0 or event.datetime < today:
+        messages.success(request, "Sorry, you can't book this event")
+        return redirect('detail', event_id)
+
+
     if request.user.is_anonymous:
         return redirect('signin')
     if request.method == "POST":
         form = BookForm(request.POST)
         if form.is_valid():
             book = form.save(commit=False)
+            event.seats-=1
+            event.save()
             book.event = event
             book.guest= request.user
             book.save()
@@ -165,6 +172,7 @@ def book_event(request, event_id):
     context = {
         "form":form,
         "event": event,
+        "today": today,
     }
     return render(request, 'book.html', context)
 
